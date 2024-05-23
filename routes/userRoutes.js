@@ -52,7 +52,7 @@ router.post('/googleLogin', async (req, res) => {
 
     try{
         const savedUser = await user.save();
-        res.send(`${savedUser.name} is now logged in`);
+        res.send({message: `${savedUser.name} is now logged in`});
     }
     catch(err){
         res.status(400).send(err.message);

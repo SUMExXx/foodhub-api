@@ -5,6 +5,9 @@ const connectDB = require('./db');
 const Product = require('./models/product')
 const productRoutes = require('./routes/productRoutes');
 const userRoutes = require('./routes/userRoutes');
+const cors = require('cors');
+
+app.use(cors());
 
 var app = express()
 
