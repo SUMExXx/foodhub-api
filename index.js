@@ -14,6 +14,14 @@ connectDB();
 
 app.use(express.urlencoded({ extended: true }));
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Allow requests from any origin
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allow specified methods
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow specified headers
+  res.setHeader('Access-Control-Allow-Credentials', true); // Allow credentials
+  next();
+});
+
 const port = process.env.PORT || 8080;
 
 app.use('/products', productRoutes);
