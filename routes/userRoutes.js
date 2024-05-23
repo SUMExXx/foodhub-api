@@ -48,6 +48,7 @@ router.post('/googleLogin', async (req, res) => {
     const user = new User({
         uuid: req.body.uuid,
         name: req.body.name,
+        email: req.body.email
     });
 
     try{
