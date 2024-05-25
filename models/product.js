@@ -1,8 +1,17 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const productSchema = new mongoose.Schema(
     {
-        title: {
+        pid: {
+            type: String,
+            required: true,
+            trim: true,
+            unique: true,
+            immutable: true,
+            default: uuidv4
+        },
+        name: {
             type: String,
             required: true,
             trim: true
@@ -17,12 +26,17 @@ const productSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
-        image: {
+        imageUrl: {
             type: String,
             required: true,
             trim: true
         },
-
+        type: {
+            type: String,
+            required: true,
+            trim: true,
+            enum: ['Indian', 'Chinese', 'Italian', 'Japanese', 'Mexican', 'Breakfast', 'Drink', 'Starter', 'Dessert']
+        },
     } 
 );
 
