@@ -327,9 +327,16 @@ router.put('/edit', upload.single('image'), async (req, res) => {
   }
 })
 
-router.delete('/delete', async (req, res) => {
+router.delete('/delete', upload.single('image'), async (req, res) => {
+
+  const { pid } = req.body;
+
   try{
-    await Product.deleteOne({ pid: req.body.pid}).then(() => res.json({ message: `Item was deleted`}))
+    await Product.findOne({pid: pid}).then( async (product) => {
+      await cloudinary.uploader.destroy(product.imagePublicId).then( async ()=> {
+        await Product.deleteOne({ pid: pid}).then(() => res.json({ message: `Item was deleted`}))
+      })
+    })
   }catch(err){
     res.status(400).send(err.message);
   }
