@@ -15,14 +15,17 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.get('/all', async (req, res) => {
     try{
         const products = await Product.find();
-        const response = {
-          pid: product.pid,
-          type: product.type,
-          desc: product.desc,
-          name: product.name,
-          price: product.price,
-          imageUrl: product.imageUrl
-        }
+        var response = []
+        products.forEach((product) => {
+          response.push({
+            pid: product.pid,
+            type: product.type,
+            desc: product.desc,
+            name: product.name,
+            price: product.price,
+            imageUrl: product.imageUrl
+          })
+        })
         res.json(response);
     }catch(err){
         res.json({message: err});
@@ -31,15 +34,18 @@ router.get('/all', async (req, res) => {
 
 router.get('/breakfast', async (req, res) => {
   try{
-    const product = await Product.find({type: 'Breakfast'});
-    const response = {
-      pid: product.pid,
-      type: product.type,
-      desc: product.desc,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl
-    }
+    const products = await Product.find({type: 'Breakfast'});
+    var response = []
+    products.forEach((product) => {
+      response.push({
+        pid: product.pid,
+        type: product.type,
+        desc: product.desc,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl
+      })
+    })
     res.send(response);
   }catch(err){
     res.status(400).send(err.message); 
@@ -48,15 +54,18 @@ router.get('/breakfast', async (req, res) => {
 
 router.get('/dessert', async (req, res) => {
   try{
-    const product = await Product.find({type: 'Dessert'});
-    const response = {
-      pid: product.pid,
-      type: product.type,
-      desc: product.desc,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl
-    }
+    const products = await Product.find({type: 'Dessert'});
+    var response = []
+    products.forEach((product) => {
+      response.push({
+        pid: product.pid,
+        type: product.type,
+        desc: product.desc,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl
+      })
+    })
     res.send(response);
   }catch(err){
     res.status(400).send(err.message); 
@@ -65,15 +74,18 @@ router.get('/dessert', async (req, res) => {
 
 router.get('/drink', async (req, res) => {
   try{
-    const product = await Product.find({type: 'Drink'});
-    const response = {
-      pid: product.pid,
-      type: product.type,
-      desc: product.desc,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl
-    }
+    const products = await Product.find({type: 'Drink'});
+    var response = []
+    products.forEach((product) => {
+      response.push({
+        pid: product.pid,
+        type: product.type,
+        desc: product.desc,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl
+      })
+    })
     res.send(response);
   }catch(err){
     res.status(400).send(err.message); 
@@ -82,15 +94,18 @@ router.get('/drink', async (req, res) => {
 
 router.get('/starter', async (req, res) => {
   try{
-    const product = await Product.find({type: 'Starter'});
-    const response = {
-      pid: product.pid,
-      type: product.type,
-      desc: product.desc,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl
-    }
+    const products = await Product.find({type: 'Starter'});
+    var response = []
+    products.forEach((product) => {
+      response.push({
+        pid: product.pid,
+        type: product.type,
+        desc: product.desc,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl
+      })
+    })
     res.send(response);
   }catch(err){
     res.status(400).send(err.message); 
@@ -99,15 +114,18 @@ router.get('/starter', async (req, res) => {
 
 router.get('/chinese', async (req, res) => {
   try{
-    const product = await Product.find({type: 'Chinese'});
-    const response = {
-      pid: product.pid,
-      type: product.type,
-      desc: product.desc,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl
-    }
+    const products = await Product.find({type: 'Chinese'});
+    var response = []
+    products.forEach((product) => {
+      response.push({
+        pid: product.pid,
+        type: product.type,
+        desc: product.desc,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl
+      })
+    })
     res.send(response);
   }catch(err){
     res.status(400).send(err.message); 
@@ -116,15 +134,18 @@ router.get('/chinese', async (req, res) => {
 
 router.get('/japanese', async (req, res) => {
   try{
-    const product = await Product.find({type: 'Japanese'});
-    const response = {
-      pid: product.pid,
-      type: product.type,
-      desc: product.desc,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl
-    }
+    const products = await Product.find({type: 'Japanese'});
+    var response = []
+    products.forEach((product) => {
+      response.push({
+        pid: product.pid,
+        type: product.type,
+        desc: product.desc,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl
+      })
+    })
     res.send(response);
   }catch(err){
     res.status(400).send(err.message); 
@@ -133,15 +154,18 @@ router.get('/japanese', async (req, res) => {
 
 router.get('/indian', async (req, res) => {
   try{
-    const product = await Product.find({type: 'Indian'});
-    const response = {
-      pid: product.pid,
-      type: product.type,
-      desc: product.desc,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl
-    }
+    const products = await Product.find({type: 'Indian'});
+    var response = []
+    products.forEach((product) => {
+      response.push({
+        pid: product.pid,
+        type: product.type,
+        desc: product.desc,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl
+      })
+    })
     res.send(response);
   }catch(err){
     res.status(400).send(err.message); 
@@ -150,15 +174,18 @@ router.get('/indian', async (req, res) => {
 
 router.get('/italian', async (req, res) => {
   try{
-    const product = await Product.find({type: 'Italian'});
-    const response = {
-      pid: product.pid,
-      type: product.type,
-      desc: product.desc,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl
-    }
+    const products = await Product.find({type: 'Italian'});
+    var response = []
+    products.forEach((product) => {
+      response.push({
+        pid: product.pid,
+        type: product.type,
+        desc: product.desc,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl
+      })
+    })
     res.send(response);
   }catch(err){
     res.status(400).send(err.message); 
@@ -167,15 +194,18 @@ router.get('/italian', async (req, res) => {
 
 router.get('/mexican', async (req, res) => {
   try{
-    const product = await Product.find({type: 'Mexican'});
-    const response = {
-      pid: product.pid,
-      type: product.type,
-      desc: product.desc,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl
-    }
+    const products = await Product.find({type: 'Mexican'});
+    var response = []
+    products.forEach((product) => {
+      response.push({
+        pid: product.pid,
+        type: product.type,
+        desc: product.desc,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl
+      })
+    })
     res.send(response);
   }catch(err){
     res.status(400).send(err.message); 
