@@ -25,6 +25,8 @@ connectDB();
 
 app.use(express.urlencoded({ extended: true }));
 
+app.set('trust proxy', 1);
+
 app.use((err, req, res, next) => {
   if (err instanceof RateLimitError) {
     res.status(429).json({ error: 'Rate limit exceeded' });
