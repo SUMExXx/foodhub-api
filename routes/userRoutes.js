@@ -4,6 +4,68 @@ const User = require('../models/user');
 const Product = require('../models/product');
 
 const bcrypt = require('bcrypt');
+const multer = require('multer');
+const Order = require('../models/order');
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+})
+
+const upload = multer({ storage: multer.memoryStorage() });
+
+//body params: uuid, name, email
+
+/* response:
+  message: String
+*/
+
+router.post('/googleLogin', upload.single('image'), async (req, res) => {
+
+  const photoUrl = req.body.photoUrl
+
+  var imgPublicId =""
+
+  await User.findOne({uuid: req.body.uuid}).then( async (user) => {
+    if(user == null){
+      try {
+        await cloudinary.uploader.upload( photoUrl, {
+          folder: 'foodhub/users',
+          resource_type: 'image',
+        }).then( async (result) => {
+          imgPublicId = result.public_id
+          const optimizedUrl = cloudinary.url(imgPublicId, {
+              fetch_format: 'auto',
+              quality: 'auto'
+          });
+          try{
+            const user = new User({
+                uuid: req.body.uuid,
+                name: req.body.name,
+                email: req.body.email,
+                imgUrl: optimizedUrl,
+                imgPublicId: imgPublicId
+            });
+
+            try{
+              const savedUser = await user.save();
+              res.send({message: `${savedUser.name} is now logged in`});
+            }
+            catch(err){
+                res.status(400).send(err.message);
+            }
+          }catch(err){
+            res.status(400).send(err.message);
+          }
+        })
+      } catch (error) {
+        res.status(500).send('Error adding user item');
+      }
+    }
+  })
+})
 
 //body params: uuid
 
@@ -18,59 +80,52 @@ const bcrypt = require('bcrypt');
     }
 */
 
-router.get('/userDetails', async (req, res) => {
+router.post('/userDetails', async (req, res) => {
 
   const id = req.body.uuid
+  console.log(id)
 
   try{
-      const user = await User.findOne({ uuid: id});
+      await User.findOne({uuid: id}).then((user) =>{
 
-      responseObject = []
+        responseObject = {
+          name: user.name,
+          email: user.email? user.email : "",
+          phone: user.phone? user.phone : "",
+          addressLine1: user.addressLine1? user.addressLine1 : "",
+          addressLine2: user.addressLine2? user.addressLine2 : "",
+          state: user.state? user.state : "",
+          imgUrl: user.imgUrl? user.imgUrl : ""
+        }
 
-      responseObject.push({
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        addressLine1: user.addressLine1,
-        addressLine2: user.addressLine2,
-        state: user.state
+        res.json(responseObject)
       })
 
-      res.json({
-        userDetails: responseObject
-      })
   }catch(err){
       res.json({message: err.message});
   }
 });
 
-//body params: uuid
-
-/* response:
-    {
-      message: String
-    }
-*/
-
-router.put('/updateDetails', async (req, res) => {
+router.put('/editUserDetails', async (req, res) => {
 
   const id = req.body.uuid
+  console.log(id)
 
   try{
-      await User.findOneAndUpdate(
-        { uuid: id },
-        { $set: { 
-          status: "out of stock" 
-        } },
-        {
-          name: req.body.name,
-          phone: req.body.phone,
-          addressLine1: req.body.addressLine1,
-          addressLine2: req.body.addressLine2,
-          state: req.body.state
-        }
-      )
-      res.json({ message: "User details have been successfully updated"})
+      await User.findOne({uuid: id}).then( async (user) =>{
+
+        user.name = req.body.name? req.body.name : user.name
+        user.email = req.body.email? req.body.email : user.email
+        user.phone = req.body.phone? req.body.phone : user.phone
+        user.addressLine1 = req.body.addressLine1? req.body.addressLine1 : user.addressLine1
+        user.addressLine2 = req.body.addressLine2? req.body.addressLine2 : user.addressLine2
+        user.state = req.body.state? req.body.state : user.state
+
+        await user.save().then(() => {
+          res.status(200).json({ message: "User details updated successfully"})
+        })
+      })
+
   }catch(err){
       res.json({message: err.message});
   }
@@ -242,30 +297,50 @@ router.delete('/deleteFromCart', async (req, res) => {
   })
 })
 
-//body params: uuid, name, email
+router.delete('/deleteItemFromCart', async (req, res) => {
+  const id = req.body.uuid
+  const pid = req.body.pid
 
-/* response:
-  message: String
-*/
-
-router.post('/googleLogin', async (req, res) => {
-  try{
-    const user = new User({
-        uuid: req.body.uuid,
-        name: req.body.name,
-        email: req.body.email
-    });
-
+  await User.findOne({ uuid: id }).then( async (user) => {
+    
+    user.cart.items.forEach((addedItem) => {
+      if(pid == addedItem.id){
+        user.cart.items.remove(addedItem)
+      }
+    })
+  
     try{
-        const savedUser = await user.save();
-        res.send({message: `${savedUser.name} is now logged in`});
+      await user.save()
+      res.status(200).json({message: 'Successfully removed Item from cart'})
     }
-    catch(err){
-        res.status(400).send(err.message);
+    catch(error){
+      res.status(400).json({ message: err.message }); 
     }
-  }catch(err){
-    res.status(400).send(err.message);
-  }
+  })
+})
+
+router.post('/placeOrder', async (req, res) => {
+  const id = req.body.uuid
+
+  await User.findOne({ uuid: id }).then( async (user) => {
+    
+    const order = new Order({
+      items: user.cart.items,
+      uuid: id,
+    })
+  
+    try{
+      await order.save().then( async () => {
+        user.cart.items = []
+        await user.save().then(() => {
+          res.status(200).json({message: 'Order placed'})
+        })
+      })
+    }
+    catch(error){
+      res.status(400).json({ message: err.message }); 
+    }
+  })
 })
 
 module.exports = router;

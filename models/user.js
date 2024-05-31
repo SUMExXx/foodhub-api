@@ -34,6 +34,14 @@ const userSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
+        imgUrl: {
+            type: String,
+            trim: true
+        },
+        imgPublicId: {
+            type: String,
+            trim: true
+        },
         email: {
             type: String,
             trim: true,
