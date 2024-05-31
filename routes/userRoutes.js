@@ -129,7 +129,7 @@ router.delete('/deleteUser', async (req, res) => {
     }
 */
 
-router.get('/cart', async (req, res) => {
+router.post('/cart', async (req, res) => {
 
   const id = req.body.uuid
 
@@ -138,27 +138,41 @@ router.get('/cart', async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     } else{
-      const cart = user.cart;
+      const cart = user.cart.items;
 
-      responseObject = []
+      if(cart.length == 0){
+        res.status(200).json([])
+      } else {
+        cartCopy = []
 
-      for(item in cart){
-        const product = await Product.findById(item.id)
-        responseObject.push({
-          name: product.name,
-          desc: product.desc,
-          price: product.price,
-          imgUrl: product.imageUrl,
-          type: product.type,
+        cart.forEach( async (item) => {
+          cartCopy.push(item)
         })
+
+        const promises = cart.map(async (item) => {
+          const product = await Product.findOne({ pid: item.id });
+          if (product) {
+            return {
+              pid: item.id,
+              name: product.name,
+              desc: product.desc,
+              price: product.price,
+              imgUrl: product.imageUrl,
+              type: product.type,
+              qty: item.qty
+            };
+          }
+          return null; // Handle the case where the product is not found
+        });
+
+        const responseObject = await Promise.all(promises);
+
+        res.json(responseObject)
       }
-      res.json({
-        products: responseObject
-      })
     }
   }
   catch(error){
-    res.status(400).json({ message: err.message }); 
+    res.status(400).json({ message: error.message }); 
   }
 })
 
@@ -170,43 +184,63 @@ router.get('/cart', async (req, res) => {
     }
 */
 
-router.put('/addToCart', async (req, res) => {
+router.post('/addToCart', async (req, res) => {
 
   const id = req.body.uuid
-  const products = req.body.products //it is an array of pid
+  const pid = req.body.pid
 
-  var oldCart = await User.findOne({ uuid: id }).cart;
-
-  for(itemID in products){
-    for(addedItem in oldCart){
-      if(itemID == addedItem.pid){
+  await User.findOne({ uuid: id }).then( async (user) => {
+    var foundFlag = false
+    user.cart.items.forEach((addedItem) => {
+      if(pid == addedItem.id){
         addedItem.qty = addedItem.qty + 1
+        foundFlag = true
       }
-      else(
-        oldCart.push({
-          id: itemID,
-          qty: 1
-        })
+    })
+
+    if(!foundFlag){
+      user.cart.items.push(
+        {
+          'id': pid,
+          'qty': 1
+        }
       )
     }
-  }
-    
-  try{
-    const user = await User.findOneAndUpdate(
-      { uuid: id },
-      { $set: { 
-        cart: oldCart
-      } }
-    ).then(
-      res.json({message: 'Successfully added to cart'})
-    )
-    
-  }
-  catch(error){
-    res.status(400).json({ message: err.message }); 
-  }
+  
+    try{
+      await user.save()
+      res.status(200).json({message: 'Successfully added to cart'})
+    }
+    catch(error){
+      res.status(400).json({ message: err.message }); 
+    }
+  })
 })
 
+router.delete('/deleteFromCart', async (req, res) => {
+  const id = req.body.uuid
+  const pid = req.body.pid
+
+  await User.findOne({ uuid: id }).then( async (user) => {
+    
+    user.cart.items.forEach((addedItem) => {
+      if(pid == addedItem.id){
+        addedItem.qty = addedItem.qty - 1
+        if(addedItem.qty == 0){
+          user.cart.items.remove(addedItem)
+        }
+      }
+    })
+  
+    try{
+      await user.save()
+      res.status(200).json({message: 'Successfully removed from cart'})
+    }
+    catch(error){
+      res.status(400).json({ message: err.message }); 
+    }
+  })
+})
 
 //body params: uuid, name, email
 

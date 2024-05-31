@@ -15,7 +15,7 @@ const limiter = rateLimit({
 
 var app = express()
 
-app.use(limiter);
+// app.use(limiter);
 
 app.use(cors());
 
@@ -27,13 +27,13 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set('trust proxy', 1);
 
-app.use((err, req, res, next) => {
-  if (err instanceof RateLimitError) {
-    res.status(429).json({ error: 'Rate limit exceeded' });
-  } else {
-    next();
-  }
-});
+// app.use((err, req, res, next) => {
+//   if (err instanceof RateLimitError) {
+//     res.status(429).json({ error: 'Rate limit exceeded' });
+//   } else {
+//     next();
+//   }
+// });
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*'); // Allow requests from any origin
