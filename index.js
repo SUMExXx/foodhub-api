@@ -5,6 +5,7 @@ const connectDB = require('./db');
 const Product = require('./models/product')
 const productRoutes = require('./routes/productRoutes');
 const userRoutes = require('./routes/userRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
@@ -47,7 +48,9 @@ const port = process.env.PORT || 8080;
 
 app.use('/products', productRoutes);
 
-app.use('/users', userRoutes)
+app.use('/users', userRoutes);
+
+app.use('/orders', orderRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
