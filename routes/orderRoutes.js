@@ -60,10 +60,10 @@ router.post('/createOrder', async (req, res) => {
 
     const id = req.body.uuid
 
-    // const total = await calculateAmount(id)
+    const total = await calculateAmount(id)
 
     const options = {
-        amount: 40 * 100, // amount in smallest currency unit
+        amount: total * 100, // amount in smallest currency unit
         receipt: Math.random(Date.now()).toString(),
         currency: "INR",
     };
